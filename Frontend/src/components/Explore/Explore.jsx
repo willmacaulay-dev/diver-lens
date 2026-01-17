@@ -15,7 +15,7 @@ export default function Explore() {
     const [page, setPage] = useState(1);
     const [spBrightness, setSpBrightness] = useState(1.0);
 
-    // handle scroll effects/background color change
+    // handle scroll effects/background color
     useEffect(() => {
         const updating = {current: false};
 
