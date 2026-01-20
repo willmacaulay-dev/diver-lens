@@ -10,7 +10,7 @@ export default function computeSurvival(species, pressure, temperature, plantLif
         "tropical": 28
     };
     const tempTarget = tempTargets[species.temperature] || 15;
-    const tempScore = 20 - Math.min(30, Math.abs(temperature - tempTarget));
+    const tempScore = 23 - Math.min(30, Math.abs(temperature - tempTarget));
 
 
     // pressure multiplier calculation

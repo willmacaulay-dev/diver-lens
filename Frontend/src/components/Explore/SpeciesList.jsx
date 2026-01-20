@@ -14,8 +14,6 @@ export default function SpeciesList({ spBrightness }) {
         aquariumSpecies, addSpecies, removeSpecies, isInAquarium
     } = useAquariumStorage();
 
-    const [numDepthCells, setNumDepthCells] = useState(0);
-
 
     // precompute random offsets for species cards
     const offsetLookup = useMemo(() => {
@@ -44,16 +42,18 @@ export default function SpeciesList({ spBrightness }) {
         return (str ?? "").trim().toLowerCase();
     }
 
+
+    const nameTerm = normalize(searchName);
+    const sciTerm = normalize(searchSciName);
+    const tempTerm = normalize(searchTemp);
+
+    const isFiltering = nameTerm.length > 0 || sciTerm.length > 0 || tempTerm.length > 0;
+
+
     // filter and sort species list
     const sortedAndFilteredSpecies = useMemo(() => {
-        const nameTerm = normalize(searchName);
-        const sciTerm = normalize(searchSciName);
-        const tempTerm = normalize(searchTemp);
 
         const sorted = [...speciesData].sort((a, b) => a.avgDepthM - b.avgDepthM);
-
-        const maxDepth = sorted[sorted.length - 1].avgDepthM;
-        setNumDepthCells(Math.floor(maxDepth / 100) + 1);
 
         return sorted.filter(sp => {
             const commonName = sp.commonName.toLowerCase();
@@ -66,18 +66,28 @@ export default function SpeciesList({ spBrightness }) {
 
             return nameOK && sciOK && tempOK;
         });
-    }, [searchName, searchSciName, searchTemp]);
+
+    }, [nameTerm, sciTerm, tempTerm]);
 
 
-    const speciesWithOffsets = sortedAndFilteredSpecies.map((sp) => {
-        const offsets = offsetLookup.get(sp.id) || {
-            offsetX: 0, offsetY: 0, rotate: 0
-        };
-        return {
-            ...sp,
-            ...offsets
-        };
-    });
+    const speciesWithOffsets = useMemo(() => {
+        return sortedAndFilteredSpecies.map((sp) => {
+            const offsets = offsetLookup.get(sp.id) || {
+                offsetX: 0, offsetY: 0, rotate: 0
+            };
+            return {
+                ...sp,
+                ...offsets
+            };
+        });
+    }, [sortedAndFilteredSpecies, offsetLookup]);
+
+
+    const numDepthCells = useMemo(() => {
+        if (!sortedAndFilteredSpecies.length) return 0;
+        const maxDepth = sortedAndFilteredSpecies[sortedAndFilteredSpecies.length - 1].avgDepthM;
+        return Math.floor(maxDepth / 100) + 1;
+    }, [sortedAndFilteredSpecies]);
 
 
     // put species into bins for every 100m avg depth
@@ -138,14 +148,13 @@ export default function SpeciesList({ spBrightness }) {
         return sliceRows;
     }
 
-    const binsWithRows = binSpeciesByDepth(speciesWithOffsets).map(bin => ({
-        ...bin,
-        rows: makeRowsForBin(bin.species)
-    }));
+    const binsWithRows = useMemo(() => {
+        return binSpeciesByDepth(speciesWithOffsets).map(bin => ({
+            ...bin,
+            rows: makeRowsForBin(bin.species)
+        }));
+    }, [speciesWithOffsets, numDepthCells]);
 
-    const maxRows = Math.max(
-        ...binsWithRows.map(bin => bin.rows.length || 0)
-    );
 
     // set of random justify-content options so species are randomly aligned in each row
     const justifyRandomOptions = [
@@ -171,8 +180,42 @@ export default function SpeciesList({ spBrightness }) {
         return justifyRandomOptions[storedIdx];
     }
 
+
+    function renderCompactGrid(allSpecies) {
+        return (
+            <div
+                style={{
+                    width: "70rem",
+                    margin: "0 auto",
+                    paddingBottom: "260px" // space for hover cards near bottom
+                }}
+            >
+                <Row className="g-0">
+                    {allSpecies.map(sp => (
+                        <Col key={sp.id} xs={12} lg={4} className="p-0">
+                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                <SpeciesCard
+                                    species={sp} isInAquarium={isInAquarium(sp.id)}
+                                    onToggleInAquarium={(fish) => {
+                                        if (isInAquarium(fish.id)) {
+                                            removeSpecies(fish);
+                                        } else {
+                                            addSpecies(fish);
+                                        }
+                                    }}
+                                    brightness={spBrightness}
+                                />
+                            </div>
+                        </Col>
+                    ))}
+                </Row>
+            </div>
+        );
+    }
+
+
     return (
-        <Container style={{ overflow: "visible" }}>
+        <Container style={{ overflow: "visible", paddingBottom: "260px" }}>
 
             { /* search filters */ }
             <Form className="my-5" style={{ position: "relative", zIndex: 3 }}>
@@ -204,80 +247,82 @@ export default function SpeciesList({ spBrightness }) {
                 </Row>
             </Form>
 
-            { /* bins of rows */ }
-            <Col>
-                {binsWithRows.map((bin, binIdx) => (
-                    <div key={binIdx} style={{ justifyContent: "center" }}>
 
-                        <div className="position-relative mb-3">
-                            <div
-                                style={{
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    width: "80%", margin: "0 auto", gap: "12px", zIndex: 10
-                                }}
-                            >
-                                <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
-                                <span
-                                    style={{
-                                        fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
-                                        color: textColor
-                                    }}
-                                >
-                                    {bin.min} m
-                                </span>
-                                <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
-                            </div>
-                        </div>
+            {isFiltering ? (
+                renderCompactGrid(speciesWithOffsets)
+            ) : (
+                <Col>
+                    {binsWithRows.map((bin, binIdx) => (
+                        <div key={binIdx} style={{ justifyContent: "center" }}>
 
-                        {bin.rows.map((sliceRows, sliceIdx) => {
-                            const sliceMin = bin.min + sliceIdx * 10;
-                            const sliceMax = sliceMin + 10;
-
-                            { /* individual rows */ }
-                            return (
+                            <div className="position-relative mb-3">
                                 <div
-                                    key={sliceIdx}
                                     style={{
-                                        width: "70rem", minHeight: "400px", marginBottom: "0.5rem", margin: "0 auto"
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        width: "80%", margin: "0 auto", gap: "12px", zIndex: 10
                                     }}
                                 >
-                                    {sliceRows.map((visualRow, visualIdx) => {
-                                        if (visualRow.length === 0) return null;
-
-                                        const justifyVar = getJustifyForRow(visualRow);
-                                        
-                                        { /* species cards in each row */ }
-                                        return (
-                                            <Row
-                                                key={visualIdx}
-                                                className={`g-5 mb-5 mt-5 ${justifyVar}`}
-                                            >
-                                                {visualRow.map(sp => (
-                                                    <Col key={sp.id} xs={12} lg={4}>
-                                                        {sp && (
-                                                            <SpeciesCard
-                                                                species={sp} isInAquarium={isInAquarium(sp.id)}
-                                                                onToggleInAquarium={(fish) => {
-                                                                    if (isInAquarium(fish.id)) {
-                                                                        removeSpecies(fish);
-                                                                    } else {
-                                                                        addSpecies(fish);
-                                                                    }
-                                                                }}
-                                                                brightness={spBrightness}
-                                                            />
-                                                        )}
-                                                    </Col>
-                                                ))}
-                                            </Row>
-                                        );
-                                    })}
+                                    <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
+                                    <span
+                                        style={{
+                                            fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
+                                            color: textColor
+                                        }}
+                                    >
+                                        {bin.min} m
+                                    </span>
+                                    <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
                                 </div>
-                            );
-                        })}
-                    </div>
-                ))}
-            </Col>
+                            </div>
+
+                            {bin.rows.map((sliceRows, sliceIdx) => {
+
+                                { /* individual rows */ }
+                                return (
+                                    <div
+                                        key={sliceIdx}
+                                        style={{
+                                            width: "70rem", minHeight: "400px", marginBottom: "0.5rem", margin: "0 auto"
+                                        }}
+                                    >
+                                        {sliceRows.map((visualRow, visualIdx) => {
+                                            if (visualRow.length === 0) return null;
+
+                                            const justifyVar = getJustifyForRow(visualRow);
+
+                                            { /* species cards in each row */ }
+                                            return (
+                                                <Row
+                                                    key={visualIdx}
+                                                    className={`g-5 mb-5 mt-5 ${justifyVar}`}
+                                                >
+                                                    {visualRow.map(sp => (
+                                                        <Col key={sp.id} xs={12} lg={4}>
+                                                            {sp && (
+                                                                <SpeciesCard
+                                                                    species={sp} isInAquarium={isInAquarium(sp.id)}
+                                                                    onToggleInAquarium={(fish) => {
+                                                                        if (isInAquarium(fish.id)) {
+                                                                            removeSpecies(fish);
+                                                                        } else {
+                                                                            addSpecies(fish);
+                                                                        }
+                                                                    }}
+                                                                    brightness={spBrightness}
+                                                                />
+                                                            )}
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </Col>
+            )}
         </Container>
     );
 }

@@ -1,4 +1,3 @@
-import { Container, Button, Card, Image } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import "./Home.css";

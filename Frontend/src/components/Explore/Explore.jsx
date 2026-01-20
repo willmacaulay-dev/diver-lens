@@ -5,14 +5,8 @@ import SpeciesList from "./SpeciesList.jsx";
 import "./Explore.css";
 
 export default function Explore() {
-    const navigate = useNavigate();
 
-    const [students, setStudents] = useState([]);
-    const [searchedName, setSearchedName] = useState('');
-    const [searchedMajor, setSearchedMajor] = useState('');
-    const [searchedInterest, setSearchedInterest] = useState('');
-    const [filteredStudents, setFilteredStudents] = useState([]);
-    const [page, setPage] = useState(1);
+    const navigate = useNavigate();
     const [spBrightness, setSpBrightness] = useState(1.0);
 
     // handle scroll effects/background color
