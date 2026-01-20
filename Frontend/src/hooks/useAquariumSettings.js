@@ -21,9 +21,9 @@ export default function useAquariumSettings() {
 	const [temperature, setTemperature] = useState(() => {
 		try {
 			const saved = JSON.parse(localStorage.getItem(KEY));
-			return clamp(saved?.temperature ?? 50);
+			return clamp(saved?.temperature ?? 15);
 		} catch {
-			return 50;
+			return 15;
 		}
 	});
 
