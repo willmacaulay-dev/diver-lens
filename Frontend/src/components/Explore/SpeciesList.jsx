@@ -172,10 +172,10 @@ export default function SpeciesList({ spBrightness }) {
     }
 
     return (
-        <Container style={{overflow: 'visible'}}>
+        <Container style={{ overflow: "visible" }}>
 
             { /* search filters */ }
-            <Form className="my-5" style={{ position: 'relative', zIndex: 3 }}>
+            <Form className="my-5" style={{ position: "relative", zIndex: 3 }}>
                 <Row className="g-2">
                     <Col xs={12} md={4}>
                         <Form.Control
@@ -207,26 +207,26 @@ export default function SpeciesList({ spBrightness }) {
             { /* bins of rows */ }
             <Col>
                 {binsWithRows.map((bin, binIdx) => (
-                    <div key={binIdx}>
+                    <div key={binIdx} style={{ justifyContent: "center" }}>
 
                         <div className="position-relative mb-3">
-                        <div
-                            style={{
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                width: "80%", margin: "0 auto", gap: "12px", zIndex: 10
-                            }}
-                        >
-                            <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
-                            <span
+                            <div
                                 style={{
-                                    fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
-                                    color: textColor
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    width: "80%", margin: "0 auto", gap: "12px", zIndex: 10
                                 }}
                             >
-                                {bin.min} m
-                            </span>
-                            <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
-                        </div>
+                                <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
+                                <span
+                                    style={{
+                                        fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap",
+                                        color: textColor
+                                    }}
+                                >
+                                    {bin.min} m
+                                </span>
+                                <div style={{ flex: 1, borderTop: `1px solid ${textColor}` }} />
+                            </div>
                         </div>
 
                         {bin.rows.map((sliceRows, sliceIdx) => {
@@ -238,7 +238,7 @@ export default function SpeciesList({ spBrightness }) {
                                 <div
                                     key={sliceIdx}
                                     style={{
-                                        width: "90vw", minHeight: "400px", marginBottom: "0.5rem"
+                                        width: "70rem", minHeight: "400px", marginBottom: "0.5rem", margin: "0 auto"
                                     }}
                                 >
                                     {sliceRows.map((visualRow, visualIdx) => {

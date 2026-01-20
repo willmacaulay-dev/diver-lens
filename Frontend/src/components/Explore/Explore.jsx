@@ -40,23 +40,23 @@ export default function Explore() {
 
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => {
-            document.body.style.backgroundColor = 'rgb(0, 20, 50)';
+            document.body.style.backgroundColor = "rgb(0, 20, 50)";
             window.removeEventListener("scroll", handleScroll);
         }
     }, []);
 
-    return <div style={{position: 'relative', overflow: 'visible', minHeight: '100vh'}}>
+    return <div style={{position: "relative", overflow: "visible", minHeight: "100vh"}}>
         <div className="water-overlay"/>
-        <Button variant="secondary" onClick={() => navigate("/")} style={{ position: "fixed", top: "25px", left: "25px", zIndex: 999 }} >
+        <Button variant="secondary" onClick={() => navigate("/")} style={{ position: "fixed", top: "3vh", left: "2vw", zIndex: 999 }} >
             Home
         </Button>
         <div className="position-relative mb-3 mt-5">
             <div style={{ display: "flex", justifyContent: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", width: "30%", gap: "12px" }}>
                     {/*<div style={{ flex: 1, borderTop: "3px solid rgb(0, 15, 48)", zIndex: 10 }} />*/}
-                    <span style={{ fontSize: "2rem", fontWeight: 750, whiteSpace: "nowrap", color: "rgb(0, 15, 48)", zIndex: 10, marginLeft: "8vw" }}>The Ocean</span>
+                    <span style={{ fontSize: "2rem", fontWeight: 750, whiteSpace: "nowrap", color: "rgb(0, 15, 48)", zIndex: 10}}>
+                        The Ocean
+                    </span>
                     {/*<div style={{ flex: 1, borderTop: "3px solid rgb(0, 15, 48)", zIndex: 10 }} />*/}
-                </div>
             </div>
         </div>
         <Container className="d-flex justify-content-center align-items-center">

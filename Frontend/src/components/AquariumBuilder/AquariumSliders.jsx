@@ -11,10 +11,10 @@ export default function AquariumSliders({
             { /* pressure slider */ }
             <Form.Group>
                 <Form.Label className="text-light">
-                    Pressure: <strong>{pressure}</strong>
+                    Pressure: <strong>{pressure} m</strong>
                 </Form.Label>
                 <Form.Range
-                    min={0} max={100} value={pressure} 
+                    min={0} max={1000} value={pressure}
                     onChange={(e) => onPressureChange(Number(e.target.value))}
                 />
             </Form.Group>
@@ -22,10 +22,10 @@ export default function AquariumSliders({
             { /* temp slider */ }
             <Form.Group>
                 <Form.Label className="text-light">
-                    Temperature: <strong>{temperature}</strong>
+                    Temperature: <strong>{temperature}°C</strong>
                 </Form.Label>
                 <Form.Range
-                    min={0} max={100} value={temperature}
+                    min={0} max={30} value={temperature}
                     onChange={(e) => onTemperatureChange(Number(e.target.value))}
                 />
             </Form.Group>
@@ -33,7 +33,7 @@ export default function AquariumSliders({
             { /* plant life slider */ }
             <Form.Group>
                 <Form.Label className="text-light">
-                    Plant Life: <strong>{plantLife}</strong>
+                    Plant Life: <strong>{plantLife}%</strong>
                 </Form.Label>
                 <Form.Range
                     min={0} max={100} value={plantLife}

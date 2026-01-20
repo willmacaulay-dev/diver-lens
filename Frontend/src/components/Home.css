@@ -13,11 +13,11 @@ html, body {
 
 
 :root {
-	--tabW: 550px;
-	--bgW: 800px;
-	--tabHover: 50px;
-	--tabsTop: 100px;
-	--textSize: 2.5rem;
+	--tabW: 83vh;
+	--bgW: 120vh;
+	--tabHover: 2vw;
+	--tabsTop: 15vh;
+	--textSize: 5vh;
 	--titleSize: 5.5vw;
 }
 
@@ -88,13 +88,13 @@ html, body {
 }
 
 /* specific shifts */
-.explore { margin-left: -150px; }
-.build { margin-left: -200px; }
-.profiles { margin-left: -249px; }
+.explore { margin-left: -22vh; }
+.build { margin-left: -29.5vh; }
+.profiles { margin-left: -36.7vh; }
 
-.explore .tab-text { transform: translateY(-50%) translateX(160px); }
-.build .tab-text { transform: translateY(-50%) translateX(160px); }
-.profiles .tab-text { transform: translateY(-50%) translateX(160px); }
+.explore .tab-text { transform: translateY(-50%) translateX(30vh); }
+.build .tab-text { transform: translateY(-50%) translateX(35vh); }
+.profiles .tab-text { transform: translateY(-50%) translateX(29vh); }
 
 
 .hero-title {
@@ -112,15 +112,24 @@ html, body {
 	white-space: nowrap;
 }
 
+
 /* mobile adjustments */
 @media (max-width: 600px) {
 	:root {
-		--tabW: 400px;
+		--tabW: 70vh;
 		--bgW: 0px;
 		--tabHover: 18px;
 		--tabsTop: 30vh;
 		--textSize: 1.25rem;
 	}
+
+	.explore { margin-left: -22vh; }
+	.build { margin-left: -28.4vh; }
+	.profiles { margin-left: -34.6vh; }
+
+	.explore .tab-text { transform: translateY(-50%) translateX(28vh); }
+	.build .tab-text { transform: translateY(-50%) translateX(32vh); }
+	.profiles .tab-text { transform: translateY(-50%) translateX(29vh); }
 
 	.hero-title {
 		right: 40px;

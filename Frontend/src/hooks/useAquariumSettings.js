@@ -11,10 +11,10 @@ function clamp(n) {
 export default function useAquariumSettings() {
 	const [pressure, setPressure] = useState(() => {
 		try {
-		const saved = JSON.parse(localStorage.getItem(KEY));
-		return clamp(saved?.pressure ?? 50);
+			const saved = JSON.parse(localStorage.getItem(KEY));
+			return clamp(saved?.pressure ?? 0);
 		} catch {
-		return 50;
+			return 0;
 		}
 	});
 
@@ -42,7 +42,7 @@ export default function useAquariumSettings() {
 		);
 	}, [pressure, temperature, plantLife]);
 
-  return {
-    pressure, setPressure, temperature, setTemperature, plantLife, setPlantLife
-  };
+	return {
+		pressure, setPressure, temperature, setTemperature, plantLife, setPlantLife
+	};
 }

@@ -1,74 +1,14 @@
 import React, { useState, useMemo } from "react";
 import { Card, Button, ProgressBar } from "react-bootstrap";
+import computeSurvival from "../../utils/computeSurvival";
 
-function computeSurvival(species, pressure, temperature, plantLife) {
-
-    // target temperature values based on preferences
-    const tempTargets = {
-        "polar": 10,
-        "cold-temperate": 25,
-        "temperate": 50,
-        "warm-temperate": 75,
-        "tropical": 90
-    };
-    const tempTarget = tempTargets[species.temperature] ?? 50;
-    const tempScore = 100 - Math.min(100, Math.abs(temperature - tempTarget));
-
-
-    const maxDepth = 2000;
-    const pressureDiff = pressure - (species.avgDepthM/maxDepth)*100
-
-    let pressureMult = 0
-
-    // pressure thresholds
-    if (pressureDiff < -50) {
-        pressureMult = 0.7;
-    } else if (pressureDiff < -25) {
-        pressureMult = 0.8;
-    } else if (pressureDiff < -10) {
-        pressureMult = 0.9;
-    } else if (pressureDiff < 10) {
-        pressureMult = 1.0;
-    } else if (pressureDiff < 25) {
-        pressureMult = 0.7;
-    } else if (pressureDiff < 50) {
-        pressureMult = 0.2
-    } else {
-        pressureMult = 0;
-    }
-
-    const pressureScoreMult = (1.0 - Math.abs(pressureDiff/100.0)) * pressureMult;
-
-
-    // plant life targets based on environment and temperature
-    let plantTarget = 50;
-    const envStr = (species.environment ?? "").toLowerCase();
-    if (envStr.includes("reef") || envStr.includes("seagrass") || envStr.includes("kelp")) {
-    plantTarget = 90;
-    } else if (envStr.includes("pelagic")) {
-    plantTarget = 30;
-    }
-    if (tempTarget <= 25) {
-    plantTarget -= 20;
-    } else if (tempTarget >= 90) {
-    plantTarget += 20;
-    }
-
-    const plantScore = 100 - Math.min(100, Math.abs(plantLife - plantTarget));
-
-    // survival score calculation
-    const raw = pressureScoreMult * ((0.6 * tempScore) + (0.4 * plantScore));
-
-    return Math.round(Math.max(0, Math.min(100, raw)));
-}
 
 export default function AquariumSpeciesTab({
     species, onRemove, pressure, temperature, plantLife
 }) {
     const [hovered, setHovered] = useState(false);
 
-    const survival = useMemo(
-        () => computeSurvival(species, pressure, temperature, plantLife),
+    const survival = useMemo(() => computeSurvival(species, pressure, temperature, plantLife),
         [species, pressure, temperature, plantLife]
     );
 

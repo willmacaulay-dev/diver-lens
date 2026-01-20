@@ -1,6 +1,6 @@
 // AquariumView.jsx
-import React, { useRef } from "react";
-import { Card, Image } from "react-bootstrap";
+import React, { useRef, useEffect, useMemo } from "react";
+import { Card, Image as RBImage } from "react-bootstrap";
 import waterGif from "../../data/misc/water_effect.gif";
 import plants0 from "../../data/misc/plants0.png";
 import plants1 from "../../data/misc/plants1.png";
@@ -18,7 +18,7 @@ function modifyScale(commonName) {
 		"Sea Pen", "Red King Crab", "Snow Crab", "Portuguese Man o' War", "Atlantic Puffin",
 		"Crown-of-Thorns Starfish", "Gentoo Penguin", "Orange Roughy",
 		"Giant Isopod", "Fangtooth", "Pink Sea Cucumber", "Scarlet Cleaner Shrimp", 
-		"Clown Anemonefish", "Blue Sea Dragon"].includes(commonName))
+		"Clown Anemonefish", "Blue Sea Dragon", "Red Sea Star", "Giant Clam"].includes(commonName))
 		return "45%";
     
     if (["Hawksbill Sea Turtle", "Atlantic Sea Nettle",
@@ -43,20 +43,32 @@ function modifyScale(commonName) {
 }
 
 export default function AquariumView({ speciesList = [], plantLife, pressure }) {
-	// plant background
-	let plantImg = plants0;
-	if (plantLife >= 75) plantImg = plants3;
-	else if (plantLife >= 50) plantImg = plants2;
-	else if (plantLife >= 25) plantImg = plants1;
+
+	// plant background, preloads imgs
+	useEffect(() => {
+		const urls = [plants0, plants1, plants2, plants3];
+		urls.forEach((src) => {
+			const img = new Image();
+			img.src = src;
+		});
+	}, []);
+
+	const plantImg = useMemo(() => {
+		if (plantLife >= 75) return plants3;
+		if (plantLife >= 50) return plants2;
+		if (plantLife >= 25) return plants1;
+
+		return plants0;
+	}, [plantLife]);
 
 	// pressure (depth) tint
-	const p = Math.max(0, Math.min(100, pressure));
-	const r = 30 * (1 - p / 100);
-	const g = 110 * (1 - p / 100);
-	const b = 180 * (1 - p / 100);
+	const p = Math.max(0, Math.min(1000, pressure));
+	const r = 30 * (1 - p / 1000);
+	const g = 110 * (1 - p / 1000);
+	const b = 180 * (1 - p / 1000);
 
-	const waterOpacity = 0.35 * (1 - p / 100);
-	const plantOpacity = 1 - p / 130;
+	const waterOpacity = 0.35 * (1 - p / 1000);
+	const plantOpacity = 1 - p / 1300;
 
 	// stabilize random species placements across re-renders
 	const placementRef = useRef(new Map());
@@ -98,7 +110,7 @@ export default function AquariumView({ speciesList = [], plantLife, pressure }) 
 			{/* plants overlay */}
 			<div
 				style={{
-					position: "absolute", inset: 0, backgroundImage: `url(${plantImg})`,backgroundSize: "cover",
+					position: "absolute", inset: 0, backgroundImage: `url(${plantImg})`, backgroundSize: "cover",
 					backgroundRepeat: "no-repeat", backgroundPosition: "center", opacity: plantOpacity,
 					pointerEvents: "none", zIndex: 0
 				}}
@@ -140,7 +152,7 @@ export default function AquariumView({ speciesList = [], plantLife, pressure }) 
 									}}
 								>
 									{ /* species image */ }
-									<Image
+									<RBImage
 										src={imgURL} alt={sp.commonName} className="aq-sprite"
 										style={{ 
 											width: modifyScale(sp.commonName), height: "auto", 

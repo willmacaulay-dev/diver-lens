@@ -9,7 +9,7 @@ export default function AquariumSpeciesTabs({
         <div
             className="mt-3 p-3 rounded"
             style={{
-                backgroundColor: "rgba(3, 10, 40, 0.95)", maxHeight: 200, overflowY: "auto"
+                backgroundColor: "rgba(3, 10, 40, 0.95)", minHeight: "10rem", overflowY: "auto"
             }}
         >
             {speciesList.map((sp) => (

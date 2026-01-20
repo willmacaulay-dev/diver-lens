@@ -1,6 +1,6 @@
-import { Container, Button, Card } from "react-bootstrap";
+import { Container, Button, Card, Image } from "react-bootstrap";
 import { useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import "./Home.css";
 import exploreTab from "../data/ui/explore_tab.png";
 import buildTab from "../data/ui/build_tab.png";
@@ -18,6 +18,14 @@ Data sources:
 
 export default function Home() {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const urls = [tabsBackground, exploreTab, buildTab, profilesTab];
+        urls.forEach((src) => {
+            const img = new window.Image();
+            img.src = src;
+        });
+    }, []);
 
     // prevent scrolling/html background on home page only, revert on unmount
     useEffect(() => {

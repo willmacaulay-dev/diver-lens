@@ -28,7 +28,7 @@ const modifyScale = (commonName) => {
 		"Sea Pen", "Red King Crab", "Snow Crab", "Portuguese Man o' War", "Atlantic Puffin",
 		"Crown-of-Thorns Starfish", "Gentoo Penguin", "Orange Roughy",
 		"Giant Isopod", "Fangtooth", "Pink Sea Cucumber", "Scarlet Cleaner Shrimp", 
-		"Clown Anemonefish", "Blue Sea Dragon"].includes(commonName))
+		"Clown Anemonefish", "Blue Sea Dragon", "Red Sea Star", "Giant Clam"].includes(commonName))
 		return "45%";
     
     if (["Hawksbill Sea Turtle", "Atlantic Sea Nettle",

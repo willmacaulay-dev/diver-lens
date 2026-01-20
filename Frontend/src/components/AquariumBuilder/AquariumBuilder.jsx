@@ -6,69 +6,9 @@ import AquariumSidebar from "./AquariumSidebar";
 import AquariumSpeciesTabs from "./AquariumSpeciesTabs";
 import useAquariumStorage from "../../hooks/useAquariumStorage";
 import useAquariumSettings from "../../hooks/useAquariumSettings";
+import computeSurvival from "../../utils/computeSurvival";
 
 
-// arbitrary calculation for survival score
-function computeSurvival(species, pressure, temperature, plantLife) {
-
-    // target temperature values based on preferences
-    const tempTargets = {
-        "polar": 10,
-        "cold-temperate": 25,
-        "temperate": 50,
-        "warm-temperate": 75,
-        "tropical": 90
-    };
-    const tempTarget = tempTargets[species.temperature] ?? 50;
-    const tempScore = 100 - Math.min(100, Math.abs(temperature - tempTarget));
-
-
-    const maxDepth = 2000;
-    const pressureDiff = pressure - (species.avgDepthM/maxDepth)*100
-
-    let pressureMult = 0
-
-    // pressure thresholds
-    if (pressureDiff < -50) {
-        pressureMult = 0.7;
-    } else if (pressureDiff < -25) {
-        pressureMult = 0.8;
-    } else if (pressureDiff < -10) {
-        pressureMult = 0.9;
-    } else if (pressureDiff < 10) {
-        pressureMult = 1.0;
-    } else if (pressureDiff < 25) {
-        pressureMult = 0.7;
-    } else if (pressureDiff < 50) {
-        pressureMult = 0.2
-    } else {
-        pressureMult = 0;
-    }
-
-    const pressureScoreMult = (1.0 - Math.abs(pressureDiff/100.0)) * pressureMult;
-
-    // target plant life targets based on environment and temperature
-    let plantTarget = 50;
-    const envStr = (species.environment ?? "").toLowerCase();
-
-    if (envStr.includes("reef") || envStr.includes("seagrass")) {
-        plantTarget = 80;
-    } else if (envStr.includes("pelagic")) {
-        plantTarget = 40;
-    }
-    if (tempTarget <= 25) {
-        plantTarget -= 20;
-    } else if (tempTarget >= 90) {
-        plantTarget += 20;
-    }
-
-    const plantScore = 100 - Math.min(100, Math.abs(plantLife - plantTarget));
-
-    // survival score calculation
-    const raw = pressureScoreMult * ((0.6 * tempScore) + (0.4 * plantScore));
-
-    return Math.round(Math.max(0, Math.min(100, raw)));
-}
 
 export default function AquariumBuilder() {
     const navigate = useNavigate();
@@ -93,39 +33,43 @@ export default function AquariumBuilder() {
     }, [aquariumSpecies, pressure, temperature, plantLife]);
 
     return (
-        <Container className="my-4" style={{ maxWidth: "75rem", width: "100%", paddingLeft: "12px", paddingRight: "12px" }}>
-            <div className="position-relative mb-3">
-                <Button variant="secondary" onClick={() => navigate("/")} className="position-absolute" style={{ left: "9vw", top: 0 }}>
-                    Home
-                </Button>
+        <Container fluid className="my-4">
+            <div className="mx-auto" style={{ maxWidth: "65rem", width: "100%" }}>
+                <div className="d-flex align-items-stretch mb-3">
+                    <div style={{ width: 80 }}>
+                        <Button variant="secondary" onClick={() => navigate("/")}>Home</Button>
+                    </div>
 
-                <h3 className="text-center m-0 fw-bold" style={{color: "white"}}>
-                    Aquarium Builder
-                </h3>
+                    <h3 className="flex-grow-1 text-center m-0 fw-bold" style={{ color: "white" }}>
+                        Aquarium Builder
+                    </h3>
+
+                    <div style={{ width: 80 }} />
+                </div>
+                <div className="my-4">
+                    <Card className="h-100 shadow-sm p-4" style={{ backgroundColor: "rgba(0, 6, 30, 0.98)", color: "white" }}>
+                        <Row className="g-4">   
+                            <Col xs={12} lg={8} className="d-flex flex-column gap-3">
+
+                                { /* aquarium view */ }
+                                <AquariumView plantLife={plantLife} pressure={pressure} speciesList={aquariumSpecies}/>
+
+                                { /* species tabs */ }
+                                <AquariumSpeciesTabs speciesList={aquariumSpecies} onRemove={removeSpecies} pressure={pressure}
+                                    temperature={temperature} plantLife={plantLife}/>
+                            </Col>
+
+                            <Col xs={12} lg={4}>
+
+                                { /* sidebar */ }
+                                <AquariumSidebar longevity={longevity} pressure={pressure} temperature={temperature}
+                                    plantLife={plantLife} onPressureChange={setPressure} onTemperatureChange={setTemperature}
+                                    onPlantLifeChange={setPlantLife}/>
+                            </Col>
+                        </Row>
+                    </Card>
+                </div>
             </div>
-            <Container className="my-4" style={{ width: "75vw", maxWidth: "75vw" }}>
-                <Card className="h-100 shadow-sm p-4" style={{ backgroundColor: "rgba(0, 6, 30, 0.98)", color: "white" }}>
-                    <Row className="g-4">   
-                        <Col xs={12} lg={8} className="d-flex flex-column gap-3">
-
-                            { /* aquarium view */ }
-                            <AquariumView plantLife={plantLife} pressure={pressure} speciesList={aquariumSpecies}/>
-
-                            { /* species tabs */ }
-                            <AquariumSpeciesTabs speciesList={aquariumSpecies} onRemove={removeSpecies} pressure={pressure}
-                                temperature={temperature} plantLife={plantLife}/>
-                        </Col>
-
-                        <Col xs={12} lg={4}>
-
-                            { /* sidebar */ }
-                            <AquariumSidebar longevity={longevity} pressure={pressure} temperature={temperature}
-                                plantLife={plantLife} onPressureChange={setPressure} onTemperatureChange={setTemperature}
-                                onPlantLifeChange={setPlantLife}/>
-                        </Col>
-                    </Row>
-                </Card>
-            </Container>
         </Container>
     );
 }
